@@ -1,0 +1,355 @@
+<html>
+<head>
+<style>
+#Id {
+      position: relative; /* Set position to relative */
+display: block;
+
+  padding-top: 50px;
+  padding-right: 30px;
+  padding-bottom: 50px;
+  padding-left: 80px;
+  background-color:white;
+      margin-bottom: 20px; /* Adds space below the first div */
+          margin-top: 20px; /* Adds space above the second div */
+         width:1000px;
+          border: 5px solid black;
+                      cursor: pointer;
+}
+#popup,#cat {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            padding: 20px;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 9999;
+        }
+#messages
+{
+            justify-content: center;
+            align-items: center;
+
+              overflow-y: scroll; /* Show vertical scrollbar */
+}
+body
+{
+  display: flex;
+            justify-content: center;
+            align-items: center;
+const jsonData = {
+  key1: 'value1',
+  key2: 'value2'
+};
+
+            margin: 0;
+
+
+}
+ #detail {
+      position: absolute;
+      top: 0;
+      right: 0;
+      margin-right: 100px;
+      margin-top: 50px;
+        padding-top: 50px;
+        padding-right:10px;
+    }
+     #email {
+      position: absolute;
+      top: 0;
+      right: 0;
+      margin-right: 100px;
+      margin-top: 100px;
+        padding-top: 50px;
+        padding-left:100px;
+    }
+    .button1 {
+      position: absolute;
+      top: 0;
+      right: 0;
+      margin-right: 100px;
+      margin-top: 200px;
+        
+    }
+    .button2
+    {
+    position: absolute;
+      top: 0;
+      right: 0;
+      margin-right: 25px;
+      margin-top: 200px;
+}
+</style>
+</head>
+<body>
+<div>
+<center>
+
+  <h1>AIRMAGIC</h1></center>
+      <button onclick="reloadPage()">Reload Page</button>
+          <button onclick="openPopup()">Open Popup</button>
+              <button type="button" onclick="category()">New Category</button>
+      <div id="popup">
+      <label>IMG-Category:</label>
+      <input type="name" id="category-name" />
+<input type="file" id="imageInput" accept="image/*">
+    <button type="button" onclick="handleImage()">Submit</button>
+    <button onclick="closePopup()">close</button>
+    
+  </div>
+  <div id="cat">
+  <label>Category-Name:
+<input type="name" id="category" >
+</label>
+    <button onclick="submit()">SUBMIT</button>
+    <button onclick="closePopup()">close</button>
+  </div>
+  <div id="messages"></div>
+  
+  <script>
+  
+
+  let f=0;
+  let v;
+    const webSocket = new WebSocket('ws://192.168.5.79:443/');
+    webSocket.onmessage = (event) => {
+      console.log(event)
+      let f=JSON.parse(event.data);
+            console.log(f.name);
+       if(f.name!="download"){     
+
+      let content=f.bin;  //f.bin is the binary image  
+      const uint8Array = new Uint8Array(content.data);
+      const imageBlob = new Blob([uint8Array], { type: 'image/png' });
+      console.log(imageBlob);
+const imageUrl=URL.createObjectURL(imageBlob);
+      var elements = document.getElementsByClassName(f.emailId);
+    const imgElement = document.createElement('img');
+    imgElement.src = imageUrl;
+    imgElement.width = 200;
+    imgElement.height = 200;
+
+if(elements.length===0){
+     // document.body.innerHTML=(elements.length);
+            var newDiv=document.createElement("div");
+
+// Create an <img> element and set its source otpnglob's URL
+var button=document.createElement("button");
+    button.textContent = "download";
+        button.setAttribute("onclick", "myFunction(this)");
+            button.setAttribute("id",f.emailId);
+                        button.setAttribute("class","button1");
+            
+        var button1=document.createElement("button");
+    button1.textContent = "remove";
+        button1.setAttribute("onclick", "remove(this)");
+            button1.setAttribute("id",f.emailId);
+            button1.setAttribute("class","button2");
+                        
+    var paragraph = document.createElement("h4");
+        var div = document.createElement("div");
+    paragraph.innerText = "NAME: "+f.name;
+    paragraph.setAttribute("id","detail");
+    newDiv.appendChild(paragraph);
+    var email = document.createElement("h4");
+    email.innerText = "EMAIL:  "+f.emailId;
+    email.setAttribute("id","email");
+   newDiv.appendChild(button);
+      newDiv.appendChild(button1);
+    newDiv.appendChild(email);
+    
+    
+div.appendChild(imgElement);
+newDiv.appendChild(div);
+newDiv.setAttribute("id","Id")
+newDiv.setAttribute("class", f.emailId);
+//newDiv.setAttribute("onclick","handleClick(this)");
+//newDiv.setAttribute("class","col-sm-7")
+// Append the <img> element to the HTML document
+document.getElementById("messages").appendChild(newDiv);
+
+}
+
+else{
+ //imgElement.style.left = "100px"; // Adjust the left position as needed
+    imgElement.style.padding = "20px"; // Adjust the top position as needed
+
+elements[0].appendChild(imgElement);
+
+}
+// Don't forget to revoke the Blob URL when you're done with the image
+URL.revokeObjectURL(imageUrl);
+}
+
+else{
+console.log(f.emailId);
+
+let contentbin=f.bin;
+console.log(contentbin.data);
+  const uint8Arrays = new Uint8Array(contentbin.data);
+      // Convert binary array to Uint8Array
+
+
+      // Convert Uint8Array to Blob
+      var blob = new Blob([uint8Arrays], { type: 'application/zip' });
+
+      // Create a download link
+      var downloadLink = document.createElement('a');
+      downloadLink.href = URL.createObjectURL(blob);
+      downloadLink.download = f.emailId+'.zip';
+
+      // Append the link to the document and trigger the click event
+      document.body.appendChild(downloadLink);
+      downloadLink.click();
+
+      // Remove the link from the document
+      document.body.removeChild(downloadLink);
+    }
+    
+    };
+    webSocket.addEventListener("open", () => {
+      console.log("We are connected");
+    });
+    function sendMessage(event) {
+      var inputMessage = document.getElementById('message')
+      webSocket.send(inputMessage.value)
+      inputMessage.value = ""
+      event.preventDefault();
+    }
+    document.getElementById('input-form').addEventListener('submit', sendMessage);
+    const myButton = document.getElementById('Id')
+    
+    
+    
+     function myFunction(button) {
+        alert("Button clicked!"+button.id);
+        let jsonData = {
+                              key1: 'download',
+                              key2:button.id
+                             };
+        webSocket.send(JSON.stringify(jsonData));
+        event.preventDefault();
+    }
+    
+    function remove(button)
+    {       // event.preventDefault();
+      var ki = document.getElementsByClassName(button.id);
+
+if (ki.length > 0) {
+                // Remove the first element with the specified class
+                ki[0].parentNode.removeChild(ki[0]);
+            } 
+        let jsonData = {
+                              key1: 'remove',
+                              key2: button.id
+                             };
+                    webSocket.send(JSON.stringify(jsonData));
+     // ko.removeChild(ki);
+    alert("remove is clicked"+button.id);
+    
+}
+ function handleClick(button) {
+            alert('Div clicked!');
+            // Add your logic or actions here
+        }
+        
+        
+        
+        
+        function handleImage() {
+      // Get the input element
+      var input = document.getElementById('imageInput');
+      
+      // Check if a file is selected
+      if (input.files && input.files[0]) {
+        // Get the selected file
+        var imageFile = input.files[0];
+
+        // You can do further processing with the file here
+        console.log('Selected image file:', imageFile);
+
+        // Optionally, display the selected image
+        displayImage(imageFile);
+      } else {
+        console.log('No image selected');
+      }
+    }
+
+    function displayImage(file) {
+      // Create a FileReader to read the file
+      var reader = new FileReader();
+
+      // Set up the FileReader onload event
+      reader.onload = function (e) {
+        // Create an image element
+        var img = document.createElement('img');
+        var cat_name=document.getElementById('category-name');
+        // Set the image source to the data URL
+        img.src = e.target.result;
+        let jsonData = {
+                              key1: 'upload',
+                              key2: img.src,
+                              key3:cat_name.value
+                             };
+        // Append the image to the body or another container
+        //document.body.appendChild(img);
+        cat_name.value="";
+                            webSocket.send(JSON.stringify(jsonData));
+      };
+
+      // Read the file as a data URL
+      reader.readAsDataURL(file);
+    }
+    function reloadPage() {
+            location.reload();
+        }
+        function category() {
+            // Get a reference to the popup element
+            var popup = document.getElementById('cat');
+            
+            // Display the popup
+            popup.style.display = 'block';
+        }
+        
+        function openPopup() {
+            // Get a reference to the popup element
+            var popup = document.getElementById('popup');
+            
+            // Display the popup
+            popup.style.display = 'block';
+        }
+
+        function closePopup() {
+            // Get a reference to the popup element
+            var popup = document.getElementById('popup');
+             var cat=document.getElementById('cat');
+            cat.style.display='none';
+            // Hide the popup
+            popup.style.display = 'none';
+        }
+        
+        
+        function submit() {
+            // Get a reference to the popup element
+
+            var cat=document.getElementById('cat');
+            cat.style.display='none';
+             var name=document.getElementById('category');
+            let jsonData = {
+                              key1: 'new-category',
+                              key2: name.value
+                             };
+           name.value="";
+           webSocket.send(JSON.stringify(jsonData));
+           console.log(jsonData);
+
+        }
+  </script>
+  </div>
+</body>
+</html>
